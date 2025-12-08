@@ -1,5 +1,5 @@
 
-<h1>Project</h1> - <h1>Deploying a Scalable AWS Architecture with Infrastructure as Code.</h1>
+<h1>Project</h1>  <h1>Deploying a Scalable AWS Architecture with Infrastructure as Code.</h1>
 
 <h1>Overview</h1>
 This project demonstrates building a Scalable web application on AWS using a mix of IaC tools.
@@ -124,6 +124,62 @@ Auto Scaling Policy:<br/>
 Run the following commands to stress test the system:<br/>
 sudo yum install -y stress<br/>
 stress –cpu 4 –timeout 60 <br/>
+
+<h3>Step 6</h3>
+<b>AWS Lambda for Logging S3 Uploads</b>
+We create a Lambda execution role, provide permissions, then deploy the function to AWS.<br/>
+Command to create role for the execution of Lambda function: aws iam create-role --role-name ProjectS3LambdaExecutionRole --assume-role-policy-document file://Shashank-puppala-trust-policy-project.json <br/>
+
+Commands to add permissions: aws iam attach-role-policy --role-name ProjectS3LambdaExecutionRole --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess  
+aws iam attach-role-policy --role-name ProjectS3LambdaExecutionRole --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole <br/>
+
+aws lambda create-function --function-name ProjectS3UploadTrigger --zip-file {file-path} --handler Shashank-puppala-s3-upload-logger-project.lambda_handler --runtime python3.12 --role arn:aws:iam::037721735198:role/ProjectS3LambdaExecutionRole <br/>
+
+Then we create the S3 bucket and provide the bucket permissions to invoke the function: <br/>
+aws lambda add-permission --function-name ProjectS3UploadTrigger --statement-id s3invoke --action lambda:InvokeFunction --principal s3.amazonaws.com --source-arn arn:aws:s3:::shashank-puppala-project-s3-bucket  <br/>
+
+aws s3api put-bucket-notification-configuration --bucket shashank-puppala-project-s3-bucket --notification-configuration file://Shashank-puppala-notification-project.json <br/>
+
+Verify in the cloudWatch Logs the output logs.<br/>
+
+<h3>Step 7</h3>
+<b>AWS Interaction</b>
+1. Create an S3 bucket and upload a file.<br/>
+AWS CLI commands -<br/>
+aws s3 mb s3://shashank-puppala-project-s3-bucket-2 --region us-east-1
+Uploading a file to bucket - <br/>
+aws s3 cp shashank-puppala-testing-file-3.txt s3://shashank-puppala-project-s3-bucket-2/  <br/>
+
+2. List running EC2 instances.<br/>
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].{ID:InstanceId,Type:InstanceType,AZ:Placement.AvailabilityZone,PrivateIP:PrivateIpAddress,PublicIP:PublicIpAddress}" --output table <br/>
+
+3. Invoke Lambda manually.<br/>
+aws lambda invoke --function-name MyHelloLambda reponse.json <br/>
+type response.json <br/>
+
+4. Retrieve Metadata of EC2 - By SSH into the EC2 Instance and running the python script to retrieve the data. (retrieve_metadata_ec2_project.py) <br/>
+
+<b>Python Boto 3 scripts to perform the operations:</b>
+Python functions can be called using the following command in the terminal where python scripts can be run :- <br/>
+Python {filename.py} <br/>
+Example :- Python Shashank-puppala-python-invoke-manually-project.py <br/>
+Similarly for all the python files
+
+<h3>Bonus Challenge</h3> 
+<b>Deploy API Gateway to invoke Lambda via HTTP requests.</b>
+1.	Go to API Gateway -> Click Create API -> Select REST API -> Click on Build -> Give a name to the API <br/>
+2.	Click Create API<br/>
+3.	After the API is created, click on Create Resource<br/>
+4.	Select Integration type as Lambda function and select the lambda function you want to invoke.<br/>
+5.	Click on Save.<br/>
+6.	Once resource, is created Click on Deploy API, and choose the stage (like prod or test)<br/>
+7.	Click on Deploy<br/>
+8.	Once you get an invoke URL, you can copy and paste it in the browser to check if it is working or not.<br/>
+
+
+
+
+
 
 
 
