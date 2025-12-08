@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploying Lambda function with basic execution role 
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-execution-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: MyHelloLambda
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              return {
+                'statusCode': 200,
+                'body': 'Hello from Lambda - Shashank Puppala!'
+              }
+      Runtime: python3.8
+
+Outputs:
+  LambdaName:
+    Description: Lambda function name
+    Value: !Ref MyLambda

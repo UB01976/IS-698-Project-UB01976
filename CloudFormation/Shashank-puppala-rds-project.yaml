@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploing RDS MySQL in private subnets using the subnets and security group (db_sg) created previously using Terraform.
+
+Parameters:
+  DBSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Default: "subnet-0ccb3181bc86d224b"   # private_subnet_ids 1 - us-east-1a
+  DBSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Default: "subnet-07d8c971fa8357be9"   # private_subnet_ids 2 - us-east-1b
+  DBSecurityGroupId:
+    Type: String
+    Default: "sg-02d1977bd943e10a7"       # db_security_group_id
+
+Resources:
+  MyDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "RDS Subnet Group"
+      SubnetIds:
+        - !Ref DBSubnet1
+        - !Ref DBSubnet2
+      DBSubnetGroupName: my-db-subnet-group
+
+  MyRDS:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: mydb
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      MasterUsername: admin
+      MasterUserPassword: MySecurePass123
+      DBSubnetGroupName: !Ref MyDBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref DBSecurityGroupId
+      PubliclyAccessible: false
+      MultiAZ: false
+      Tags:
+      - Key: Name
+        Value: "Shashank-RDS-Instance"
+
+Outputs:
+  DBInstanceId:
+    Description: RDS Instance Identifier
+    Value: !Ref MyRDS
+
+  DBEndpoint:
+    Description: RDS Endpoint Address
+    Value: !GetAtt MyRDS.Endpoint.Address

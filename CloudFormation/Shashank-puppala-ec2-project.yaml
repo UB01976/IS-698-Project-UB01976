@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploying EC2 instance with and HTML page using the existing VPC, Subnets, and Security groups created earlier with the help of Terraform.
+
+Parameters:
+  KeyName:
+    Type: String
+    Default: Final
+    Description: EC2 Key Pair for SSH
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet where EC2 will be launched
+    Default: "subnet-0a8736df876f2047c"   # public subnet_id
+
+  SecurityGroupId:
+    Type: String
+    Description: Security Group ID in the same VPC
+    Default: "sg-0e042b05953c64171"       # web_security_group_id
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0fa3fe0fa7920f68e    
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: shashank-puppala-EC2-instance-project
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          yum install -y httpd
+          systemctl start httpd
+          echo "<html><h1>Shashank Puppala - EC2 deployed via CloudFormation</h1></html>" > /var/www/html/index.html
+          systemctl enable httpd
+
+Outputs:
+  InstanceId:
+    Description: EC2 InstanceId
+    Value: !Ref EC2Instance
