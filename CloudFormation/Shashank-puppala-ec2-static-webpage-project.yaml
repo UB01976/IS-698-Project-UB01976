@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy a simple static HTML web application on EC2 using Apache
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair for SSH access
+    Type: AWS::EC2::KeyPair::KeyName
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t3.micro
+
+  SubnetId:
+    Description: Subnet ID for the EC2 instance
+    Type: AWS::EC2::Subnet::Id
+
+  SecurityGroupId:
+    Description: Security Group ID for the EC2 instance
+    Type: AWS::EC2::SecurityGroup::Id
+
+Resources:
+  WebAppInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      ImageId: ami-0fa3fe0fa7920f68e  # Amazon Linux 2023 (us-east-1)
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref SecurityGroupId
+          AssociatePublicIpAddress: true
+      Tags:
+        - Key: Name
+          Value: WebAppInstance
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl enable httpd
+          systemctl start httpd
+          echo "<!DOCTYPE html>
+          <html>
+            <head><title>My Static Web App</title></head>
+            <body>
+              <h1>Hello from EC2! - This is Shashank Puppala's Static Web Page</h1>
+              <p>This static web page is deployed via CloudFormation.</p>
+            </body>
+          </html>" > /var/www/html/index.html
+
+Outputs:
+  InstancePublicIP:
+    Description: Public IP of the EC2 instance
+    Value: !GetAtt WebAppInstance.PublicIp
+  InstancePublicDNS:
+    Description: Public DNS of the EC2 instance
+    Value: !GetAtt WebAppInstance.PublicDnsName
