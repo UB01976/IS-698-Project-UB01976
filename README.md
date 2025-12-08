@@ -25,5 +25,16 @@ aws cloudformation deploy --stack-name ec2-stack --template-file <file-name-ec2-
 
 <h3>Step 4</h3>
 <b>Configure the database backend for the application.</b>
+Get the RDS endpoints from the Console and SSH into the instance using;<br/>
+ssh -i <Key_Value_Pair> ec2-user@<Public_IP> <br/>
+Then run the following commands;
+  
+sh
+sudo yum update –y 
+sudo dnf install mariadb105 -y 
+sudo systemctl enable httpd
+sudo systemctl start httpd
+mysql -h <RDS-endpoint> -u <username> -p
+
 
 
