@@ -1,6 +1,5 @@
----
 
-Project Overview
+<h1>Project Overview</h1>:
 This project demonstrates building a Scalable web application on AWS using a mix of IaC tools.
 
 The system consists of following resource components:
@@ -11,7 +10,6 @@ The system consists of following resource components:
 - Lambda function triggered by S3 uploads
 - AWS CLI and Python Boto3 scripts for AWS interaction
 
----
 
 <h1>Deploying a Scalable AWS Architecture with Infrastructure as Code.</h1>
 <h3>Step 1</h3>
