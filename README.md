@@ -33,7 +33,7 @@ sudo yum update –y <br/>
 sudo dnf install mariadb105 -y <br/>
 sudo systemctl enable httpd <br/>
 sudo systemctl start httpd <br/>
-mysql -h <RDS-endpoint> -u <username> -p <br/>
+mysql -h {RDS-endpoint} -u {username} -p <br/>
 
 Once Database is installed into the EC2 instance, insert the employee data that has to be displayed: <br/>
 CREATE TABLE employees (Id INT  PRIMARY KEY, Name VARCHAR(50) NOT NULL, email VARCHAR(100), Department VARCHAR(50) );<br/>
@@ -47,6 +47,26 @@ Verify the output on the browser.
 
 <h3>Step 5</h3>
 <b>Implement autoscaling for EC2 instances.</b>
+Steps to Create Web Server Instance – 
+1.	Go to EC2 on Console → Click on Instances → Select Launch Instance <br/>
+2.	Set:<br/>
+    Name: WebServer-Base<br/>
+    AMI: Amazon Linux 2 (ex: - ami-0fa3fe0fa7920f68e)<br/>
+    Instance Type: t3.micro<br/>
+    Key Pair: Select existing from your Account<br/>
+    Network: Choose public subnet which we have created for web server <br/>
+    Auto-assign Public IP: Enabled<br/>
+  Security Group: Select the web server sg created using Terraform (Which allows SSH (from 22) & HTTP (80)<br/>
+3.	Launch the instance.
+
+Step 2 would be creating the AMI Image of the instance;<br/>
+1.	Select the instance → Actions → Image → Create Image<br/>
+2.	Name the AMI: Provide a Name to the Image <br/>
+3.	Click Create Image<br/>
+4.	Wait until status is “available.”<br/>
+
+
+
 
 
 
