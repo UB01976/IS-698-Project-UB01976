@@ -10,3 +10,8 @@ Once deployed verify the resources in Console.
 
 <h3>Step 2</h3>
 Use CloudFormation to provision the EC2, RDS, and Lambda Resources.
+Using the provided Cloudformation yaml templates deploy the resources with the following commands;
+For EC2-Stack -> aws cloudformation deploy --stack-name ec2-stack --template-file <file-name-ec2.yaml> --parameter-overrides KeyName=<key-value-pair> --region us-east-1
+For RDS-Stack -> aws cloudformation deploy --stack-name rds-stack --template-file <file-name-rds.yaml> --region us-east-1
+For Lambda-Stack -> aws cloudformation deploy --stack-name lambda-stack --template-file <file-name-lambda.yaml> --capabilities CAPABILITY_NAMED_IAM --region us-east-1
+Once, all the Cloudformation stacks are deployed, verify in the console.
