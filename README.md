@@ -1,5 +1,7 @@
 
-<h1>Project Overview</h1>:
+<h1>Project</h1> - <h1>Deploying a Scalable AWS Architecture with Infrastructure as Code.</h1>
+
+<h1>Overview</h1>
 This project demonstrates building a Scalable web application on AWS using a mix of IaC tools.
 
 The system consists of following resource components:
@@ -11,7 +13,7 @@ The system consists of following resource components:
 - AWS CLI and Python Boto3 scripts for AWS interaction
 
 
-<h1>Deploying a Scalable AWS Architecture with Infrastructure as Code.</h1>
+
 <h3>Step 1</h3>
 <b>The project begins from creation of Networking resources using Terraform.</b><br/>
 First the Networking resource components like VPC, Subnets, Route tables, Associations, IGW (Internet Gateway), and Security Groups are created using terraform.
@@ -70,13 +72,61 @@ Steps to Create Web Server Instance –
     Network: Choose public subnet which we have created for web server <br/>
     Auto-assign Public IP: Enabled<br/>
   Security Group: Select the web server sg created using Terraform (Which allows SSH (from 22) & HTTP (80)<br/>
-3.	Launch the instance.
+3.	Launch the instance.<br/>
 
 Step 2 would be creating the AMI Image of the instance;<br/>
 1.	Select the instance → Actions → Image → Create Image<br/>
 2.	Name the AMI: Provide a Name to the Image <br/>
 3.	Click Create Image<br/>
 4.	Wait until status is “available.”<br/>
+
+Step 3: - Create a Launch Template<br/>
+1.	Go to EC2 → Launch Templates → Create Template<br/>
+2.	Use the created AMI from the above step once it is available.<br/>
+3.	Set instance type and security group (Web-sg).<br/>
+4.	Note: - Do not select any subnet while creation.<br/>
+5.	Create a template.<br/>
+
+Step 4: - ALB and Target Groups
+For Target Group creation: -<br/>
+1.	Go to EC2 → Target Groups → Create<br/>
+2.	Choose  Instance target type.<br/>
+3.	Select Protocol:HTTP1 <br/>
+4.	Set port 80 , Name the Target group , and health check path  to /.<br/>
+5.	Note: - Do not register targets manually; autoscaling will allocate automated resources.<br/>
+
+Next for ALB creation;
+1.	Go to EC2 → Load Balancers → Create ALB <br/>
+2.	Name ALB (Application Load Balancing)<br/>
+3.	Select the Scheme: Internet-facing<br/>
+4.	Listeners: HTTP 80<br/>
+5.	Subnets: Select Two public subnets in different AZs (Which we have created in the earlier steps using terraform)<br/>
+6.	Security Group: ALB-SG<br/>
+7.	Attach the previously created Target Group from the above step.<br/>
+8.	Click Create Load Balancer and wait until it is active.<br/>
+
+Step 5: - Creation of Auto Scaling Group (ASG)<br/>
+1.	Go to EC2 → Select Auto Scaling Groups → Click on Create<br/>
+2.	Select the Launch Template which you created earlier.<br/>
+3.	Select the VPC and 2 of the public subnets (Created before, the custom VPC from terraform and respective 2 public subnets in different availability zones).<br/>
+4.	Attach to the ALB by selecting the Target Group.<br/>
+5.	Set capacities: Minimum: 1<br/>
+                    Maximum: 3<br/>
+6.	Click Next and Click on Create Auto Scaling Group.<br/>
+
+Auto Scaling Policy:<br/>
+1.	Open ASG → Click on Automatic Scaling → Add Policy<br/>
+2.	Select Target Tracking Policy<br/>
+3.	Choose Average CPU Utilization<br/>
+4.	Set target threshold (e.g., 30–50%).<br/>
+5.	Save policy.<br/>
+
+Run the following commands to stress test the system:<br/>
+sudo yum install -y stress<br/>
+stress –cpu 4 –timeout 60 <br/>
+
+
+
 
 
 
