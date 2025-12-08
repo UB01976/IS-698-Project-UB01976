@@ -114,6 +114,7 @@ Step 5: - Creation of Auto Scaling Group (ASG)<br/>
                     Maximum: 3<br/>
 6.	Click Next and Click on Create Auto Scaling Group.<br/>
 
+Create a Auto Scaling policy so that the ASG knows when to Scale up and SCale down the resources.<br/>
 Auto Scaling Policy:<br/>
 1.	Open ASG → Click on Automatic Scaling → Add Policy<br/>
 2.	Select Target Tracking Policy<br/>
@@ -125,14 +126,19 @@ Run the following commands to stress test the system:<br/>
 sudo yum install -y stress<br/>
 stress –cpu 4 –timeout 60 <br/>
 
-<h3>Step 6</h3>
-<b>AWS Lambda for Logging S3 Uploads</b>
-We create a Lambda execution role, provide permissions, then deploy the function to AWS.<br/>
-Command to create role for the execution of Lambda function: aws iam create-role --role-name ProjectS3LambdaExecutionRole --assume-role-policy-document file://Shashank-puppala-trust-policy-project.json <br/>
+You can check in the ASG Activity tab whether instances are created or not.<br/>
 
-Commands to add permissions: aws iam attach-role-policy --role-name ProjectS3LambdaExecutionRole --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess  
+<h3>Step 6</h3>
+<b>AWS Lambda for Logging S3 Uploads</b><br/>
+We create a Lambda execution role, provide permissions, then deploy the function to AWS.<br/>
+Command to create role for the execution of Lambda function: <br/>
+aws iam create-role --role-name ProjectS3LambdaExecutionRole --assume-role-policy-document file://Shashank-puppala-trust-policy-project.json <br/>
+
+Commands to add permissions: <br/>
+aws iam attach-role-policy --role-name ProjectS3LambdaExecutionRole --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess  <br/>
 aws iam attach-role-policy --role-name ProjectS3LambdaExecutionRole --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole <br/>
 
+Compress the Function file and deploy it: <br/>
 aws lambda create-function --function-name ProjectS3UploadTrigger --zip-file {file-path} --handler Shashank-puppala-s3-upload-logger-project.lambda_handler --runtime python3.12 --role arn:aws:iam::037721735198:role/ProjectS3LambdaExecutionRole <br/>
 
 Then we create the S3 bucket and provide the bucket permissions to invoke the function: <br/>
@@ -143,7 +149,7 @@ aws s3api put-bucket-notification-configuration --bucket shashank-puppala-projec
 Verify in the cloudWatch Logs the output logs.<br/>
 
 <h3>Step 7</h3>
-<b>AWS Interaction</b>
+<b>AWS Interaction</b><br/>
 1. Create an S3 bucket and upload a file.<br/>
 AWS CLI commands -<br/>
 aws s3 mb s3://shashank-puppala-project-s3-bucket-2 --region us-east-1
