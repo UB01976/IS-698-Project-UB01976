@@ -1,3 +1,18 @@
+---
+
+Project Overview
+This project demonstrates building a Scalable web application on AWS using a mix of IaC tools.
+
+The system consists of following resource components:
+- Terraform to create VPC, subnets, route tables, and security groups
+- Cloudformation to Deploy EC2, RDS, and Lambda
+- RDS MySQL database integrated with EC2
+- Auto Scaling Group creation
+- Lambda function triggered by S3 uploads
+- AWS CLI and Python Boto3 scripts for AWS interaction
+
+---
+
 <h1>Deploying a Scalable AWS Architecture with Infrastructure as Code.</h1>
 <h3>Step 1</h3>
 <b>The project begins from creation of Networking resources using Terraform.</b><br/>
